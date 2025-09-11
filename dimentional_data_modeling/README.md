@@ -6,3 +6,10 @@
 
 ## saved sql scripts
 - lab sql scripts are saved in `live_sql` folder, until i figure out docker file permisions with the host in automatic loading and saving in the host machine
+
+### Structure
+- docker-compose.yaml runs postgres and pgAdmin docker containers
+- data.dump is for loading the players_season data tables automatically with the help of `scripts/init-db.sh` 
+- example.env used for env variables as .env is ignored in gitignore as safety measure when adding additonal api variables
+- Makefile used for one line easy runs 
+- live_sql used for saving sql script files for the labs
