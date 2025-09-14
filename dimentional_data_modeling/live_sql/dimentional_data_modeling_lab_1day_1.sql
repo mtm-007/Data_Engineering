@@ -23,6 +23,7 @@
 -- 	scoring_class scoring_class,
 -- 	years_since_last_season INTEGER,
 -- 	current_season INTEGER,
+-- 	is_active BOOLEAN,
 -- 	PRIMARY KEY(player_name, current_season)
 -- )
 
