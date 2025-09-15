@@ -1,3 +1,6 @@
+--this query has a dependent on yesterday data as its sequential problem makes its harder to backfill
+
+
 -- CREATE TYPE scd_type AS (
 -- 					scoring_class scoring_class,
 -- 					is_active BOOLEAN,
@@ -12,7 +15,13 @@ WITH last_season_scd AS(
 	AND end_season = 2021
 ),
 	historical_scd AS(
-	SELECT * FROM players_scd
+	SELECT 
+		player_name,
+		scoring_class,
+		is_active,
+		start_season,
+		end_season
+	FROM players_scd
 	WHERE current_season = 2021
 	AND end_season < 2021
 	),
@@ -56,7 +65,8 @@ WITH last_season_scd AS(
 	LEFT JOIN last_season_scd ls ON ts.player_name = ls.player_name
 	WHERE (ts.scoring_class <> ls.scoring_class
 	OR ts.is_active <> ls.is_active)
-	),
+--assumption taken here that scoring_class and is_active are never NULL, or can use is DISTINCT FROM to handle NULL instead of <>
+),
 
 	unnested_changed_records AS(
 		SELECT 
@@ -82,8 +92,19 @@ WITH last_season_scd AS(
 	)
 
 
+SELECT * FROM historical_scd
+
+UNION ALL
+
+SELECT * FROM unchanged_records
+
+UNION ALL
 
 SELECT * FROM unnested_changed_records
+
+UNION ALL
+
+SELECT * FROM new_records
 
 
 
