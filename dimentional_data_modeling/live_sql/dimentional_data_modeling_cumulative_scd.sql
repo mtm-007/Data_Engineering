@@ -1,3 +1,11 @@
+-- CREATE TYPE scd_type AS (
+-- 					scoring_class scoring_class,
+-- 					is_active BOOLEAN,
+-- 					start_season INTEGER,
+-- 					end_season INTEGER
+-- )
+
+
 WITH last_season_scd AS(
 	SELECT * FROM players_scd
 	WHERE current_season = 2021
@@ -12,13 +20,79 @@ WITH last_season_scd AS(
 	this_season_data AS(
 	SELECT * FROM players
 	WHERE current_season = 2022
+	),
+
+	unchanged_records AS (
+	SELECT 
+		ts.player_name,
+		ts.scoring_class,
+		ts.is_active,
+		ls.start_season,
+		ts.current_season as end_season
+	FROM this_season_data ts 
+	JOIN last_season_scd ls ON ts.player_name = ls.player_name
+	WHERE ts.scoring_class = ls.scoring_class
+	AND ts.is_active = ls.is_active
+),
+	changed_records AS(
+	SELECT 
+		ts.player_name,
+		UNNEST (ARRAY[
+			ROW(
+				ls.scoring_class,
+				ls.is_active,
+				ls.start_season,
+				ls.end_season
+			)::scd_type,
+			
+			ROW(
+				ts.scoring_class,
+				ts.is_active,
+				ts.current_season,
+				ts.current_season
+			)::scd_type
+		]) AS records
+	FROM this_season_data ts 
+	LEFT JOIN last_season_scd ls ON ts.player_name = ls.player_name
+	WHERE (ts.scoring_class <> ls.scoring_class
+	OR ts.is_active <> ls.is_active)
+	),
+
+	unnested_changed_records AS(
+		SELECT 
+			player_name,
+			(records::scd_type).scoring_class,
+			(records::scd_type).is_active,
+			(records::scd_type).start_season,
+			(records::scd_type).end_season
+		FROM changed_records
+	),
+
+	new_records AS (
+		SELECT 
+			ts.player_name,
+			ts.scoring_class,
+			ts.is_active,
+			ts.current_season as start_season,
+			ts.current_season as end_season
+		FROM this_season_data ts
+		LEFT JOIN last_season_scd ls 
+		ON ts.player_name = ls.player_name
+		WHERE ls.player_name IS NULL
 	)
 
-SELECT 
-	ts.player_name,
-	ts.scoring_class as ts_scoring_class,
-	ts.is_active as ts_is_active,
-	ls.scoring_class as ls_scoring_class,
-	ls.is_active as ls_is_active
-FROM this_season_data ts 
-LEFT JOIN last_season_scd ls ON ts.player_name = ls.player_name
+
+
+SELECT * FROM unnested_changed_records
+
+
+
+
+-- SELECT 
+-- 	ts.player_name,
+-- 	ts.scoring_class as ts_scoring_class,
+-- 	ts.is_active as ts_is_active,
+-- 	ls.scoring_class as ls_scoring_class,
+-- 	ls.is_active as ls_is_active
+-- FROM this_season_data ts 
+-- LEFT JOIN last_season_scd ls ON ts.player_name = ls.player_name
