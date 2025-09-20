@@ -1,11 +1,11 @@
 import schedule
 import time
+from datetime import datetime
 from script import run_stock_job
 
-from datatime import datatime
 
 def basic_job():
-    print("job started at:", datatime.now())
+    print("job started at:", datetime.now())
 
 
 schedule.every().minute.do(basic_job)
