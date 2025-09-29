@@ -16,7 +16,7 @@ CREATE TYPE edge_type AS
 		  'plays_on'
 		  )
 
-CREATE TABLE egdes (
+CREATE TABLE edges (
 	subject_identifier TEXT,
 	subject_type vertex_type,
 	object_identifier TEXT,
