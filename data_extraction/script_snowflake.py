@@ -117,12 +117,12 @@ def load_to_snowflake(rows, fieldnames):
             columns_sql_parts = []
             for col in fieldnames:
                 col_type = type_overrides.get(col,  'VARCHAR')
-                columns_sql_parts.append(f'"{col.upper()}", {col_type}')
+                columns_sql_parts.append(f'"{col.upper()}" {col_type}')
 
-            create_table_sql = f"CREATE TABLE IF NOT EXISTS {table_name} (' + ', '.join(columns_sql_parts) + ')"
+            create_table_sql = f'CREATE TABLE IF NOT EXISTS {table_name} (' + ', '.join(columns_sql_parts) + ')'
             cs.execute(create_table_sql)
 
-            column_list = ', '.join([f'"{c.upper}"' for c in fieldnames])
+            column_list = ', '.join([f'"{c.upper()}"' for c in fieldnames])
             placeholders = ', '.join([f'%({c})s' for c in fieldnames])
             insert_sql = f'INSERT INTO  {table_name} ({column_list} ) VALUES ({placeholders})'
 
