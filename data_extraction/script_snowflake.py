@@ -14,7 +14,7 @@ DS = '2025-09-30'
 
 
 def run_stock_job():
-    DS= datetime.now().strftime('%Y-%m-%d')
+    DS = datetime.now().strftime('%Y-%m-%d')
     url =f"https://api.polygon.io/v3/reference/tickers?market=stocks&active=true&order=asc&limit={LIMIT}&sort=ticker&apiKey={API_KEY}"
     
     response = requests.get(url)
@@ -50,7 +50,8 @@ def run_stock_job():
         'cik': '0000052848', 
         'composite_figi': 'BBG000HX9TN0', 
         'share_class_figi': 'BBG001SHVTX5', 
-        'last_updated_utc': '2025-09-19T06:05:18.517298768Z'
+        'last_updated_utc': '2025-09-19T06:05:18.517298768Z',
+        'ds': '2025-09-30'
     }
     fieldnames = list(sample_ticker.keys())
 
